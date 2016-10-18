@@ -44,6 +44,10 @@ public class TraceService {
     @NotNull
     private String projectId;
 
+    @Value("${trace.is.enabled:true}")
+    @NotNull
+    private Boolean toBeUsed;
+
     private Tracer tracer;
 
     private TraceContextHandler traceContextHandler;
@@ -89,7 +93,10 @@ public class TraceService {
      * @return A tracer created with basis in the service
      */
     public ManagedTracer createManagedTracer() {
-        ManagedTracer managedTracer = new TraceContextHandlerTracer(tracer, traceContextHandler);
-        return managedTracer;
+        return new TraceContextHandlerTracer(tracer, traceContextHandler);
+    }
+
+    public boolean isToBeUsed() {
+        return toBeUsed.booleanValue();
     }
 }
