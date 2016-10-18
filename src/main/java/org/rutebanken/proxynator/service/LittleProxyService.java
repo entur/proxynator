@@ -1,5 +1,7 @@
 package org.rutebanken.proxynator.service;
 
+import org.littleshoot.proxy.HttpProxyServer;
+import org.littleshoot.proxy.impl.DefaultHttpProxyServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,30 +18,33 @@ import javax.validation.constraints.NotNull;
 public final class LittleProxyService {
     private Logger log = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${etcd.endpoint:delete}")
+    @Value("${proxy.port:9097}")
     @NotNull
-    private String etcdEndpoint;
+    private Integer port;
 
-    @Value("${etcd.prefix:delete}")
-    @NotNull
-    private String prefix;
+    private HttpProxyServer server;
 
     @PostConstruct
-    public void createEtcdclient()  {
-        log.info("Using the following as etcd endpoint: " + etcdEndpoint);
+    public void createProxy()  {
+        log.info("Listening on proxy port: " + port);
+
+        server = DefaultHttpProxyServer.bootstrap()
+                .withAllowLocalOnly(false)
+                .withPort(port.intValue())
+                .start();
+
     }
 
     @PreDestroy
-    public void closeClient() {
+    public void closeProxy() {
+        log.info("Stopping proxy server" );
+        server.stop();
+        server = null;
+        log.info("Proxy server stopped" );
     }
 
     public boolean isAlive() {
-        try {
-            return true;
-        } catch ( Exception e ) {
-            log.error("Got exception checking for version. Method isAlive will return false. Masked, the exception was: "+e);
-            return false;
-        }
+        return server != null;
     }
 
 }

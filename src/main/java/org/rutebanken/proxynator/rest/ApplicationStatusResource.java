@@ -1,7 +1,10 @@
 package org.rutebanken.proxynator.rest;
 
+import org.rutebanken.proxynator.service.LittleProxyService;
+import org.rutebanken.proxynator.service.TraceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.GET;
@@ -16,21 +19,38 @@ public class ApplicationStatusResource {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    @Autowired
+    private LittleProxyService proxy;
+
+    @Autowired
+    private TraceService traceService;
+
+    private boolean achieveAlivnessOnce = false;
+
     @GET
     @Path("/ready")
     public Response isReady() {
         logger.debug("Checking readiness...");
-        return Response.ok("OK").build();
-            /*return Response.serverError()
+        if ( proxy.isAlive() && traceService.isAlive()) {
+            achieveAlivnessOnce = true;
+            return Response.ok("OK").build();
+        }
+        return Response.serverError()
                        .status(Response.Status.SERVICE_UNAVAILABLE)
-                       .entity("No etcd connection")
-                       .build();*/
+                       .entity("One or more services are not running")
+                       .build();
     }
 
     @GET
     @Path("/up")
     public Response isUp() {
-        return Response.ok("OK").build();
+        if ( achieveAlivnessOnce ) {
+            return Response.ok("OK").build();
+        }
+        return Response.serverError()
+                .status(Response.Status.SERVICE_UNAVAILABLE)
+                .entity("I have not achieved aliveness even once.")
+                .build();
     }
 
 }

@@ -150,32 +150,39 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.google.cloud.trace</groupId>
             <artifactId>core</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.google.cloud.trace</groupId>
             <artifactId>java-timestamp</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.google.cloud.trace</groupId>
             <artifactId>v1</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.google.cloud.trace</groupId>
             <artifactId>grpc-sink</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.google.auth</groupId>
             <artifactId>google-auth-library-oauth2-http</artifactId>
             <version>0.4.0</version>
         </dependency>
+
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty</artifactId>
             <version>1.0.1</version>
         </dependency>
+
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-tcnative-boringssl-static</artifactId>
@@ -184,6 +191,11 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <!-- classifier>${os.detected.classifier}</classifier -->
         </dependency>
 
+        <dependency>
+            <groupId>org.littleshoot</groupId>
+            <artifactId>littleproxy</artifactId>
+            <version>1.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
