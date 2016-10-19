@@ -47,7 +47,7 @@ public class TracerFilter extends HttpFiltersAdapter {
 
     @Override
     public HttpObject serverToProxyResponse(HttpObject httpObject) {
-        if ( ProxyUtils.isLastChunk(httpObject)) {
+        if ( ProxyUtils.isLastChunk(httpObject) || httpObject instanceof HttpResponse) {
             log.debug("Call finished... ("+originalRequest.uri()+")");
             managedTracer.endSpan();
         }
