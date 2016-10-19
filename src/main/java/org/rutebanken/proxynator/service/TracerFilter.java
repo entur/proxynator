@@ -32,7 +32,7 @@ public class TracerFilter extends HttpFiltersAdapter {
     public HttpResponse clientToProxyRequest(HttpObject httpObject) {
         if ( httpObject instanceof HttpRequest ) {
             String name = originalRequest.uri();
-            log.debug("Call finished... ("+name+")");
+            log.info("Call starting... ("+name+")");
             try {
                 URI uri = new URI( name );
                 name = uri.getHost()+uri.getPath();
@@ -46,7 +46,7 @@ public class TracerFilter extends HttpFiltersAdapter {
     @Override
     public HttpObject serverToProxyResponse(HttpObject httpObject) {
         if ( ProxyUtils.isLastChunk(httpObject)) {
-            log.debug("Call finished... ("+originalRequest.uri()+")");
+            log.info("Call finished... ("+originalRequest.uri()+")");
             managedTracer.endSpan();
         }
 
