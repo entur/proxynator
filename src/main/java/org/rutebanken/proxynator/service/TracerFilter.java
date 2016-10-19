@@ -39,7 +39,9 @@ public class TracerFilter extends HttpFiltersAdapter {
                 URI uri = new URI( name );
                 name = uri.getHost()+uri.getPath();
             } catch (URISyntaxException e) {}
-            managedTracer.startSpan(name);
+            if ( managedTracer != null ) {
+                managedTracer.startSpan(name);
+            }
         }
 
         return null;
@@ -47,9 +49,11 @@ public class TracerFilter extends HttpFiltersAdapter {
 
     @Override
     public HttpObject serverToProxyResponse(HttpObject httpObject) {
-        if ( ProxyUtils.isLastChunk(httpObject) || httpObject instanceof HttpResponse) {
+        if ( ProxyUtils.isLastChunk(httpObject)) {
             log.debug("Call finished... ("+originalRequest.uri()+")");
-            managedTracer.endSpan();
+            if ( managedTracer != null ) {
+                managedTracer.endSpan();
+            }
         }
 
         return httpObject;

@@ -25,14 +25,13 @@ public class ApplicationStatusResource {
     @Autowired
     private TraceService traceService;
 
-    private boolean achieveAlivnessOnce = false;
+    private boolean achieveAlivenessOnce = false;
 
     @GET
     @Path("/ready")
     public Response isReady() {
-        logger.debug("Checking readiness...");
         if ( proxy.isAlive() && traceService.isAlive()) {
-            achieveAlivnessOnce = true;
+            achieveAlivenessOnce = true;
             return Response.ok("OK").build();
         }
         return Response.serverError()
@@ -44,7 +43,7 @@ public class ApplicationStatusResource {
     @GET
     @Path("/up")
     public Response isUp() {
-        if ( achieveAlivnessOnce ) {
+        if (achieveAlivenessOnce) {
             return Response.ok("OK").build();
         }
         return Response.serverError()
