@@ -74,9 +74,9 @@ public class TraceService {
                 traceContextFactory.rootContext());
 
         // Uncomment if you want to debug connection at startup
-        //ManagedTracer managedTracer = new TraceContextHandlerTracer(tracer, traceContextHandler);
-        //managedTracer.startSpan("proxynator.start");
-        //managedTracer.endSpan();
+        ManagedTracer managedTracer = new TraceContextHandlerTracer(tracer, traceContextHandler);
+        managedTracer.startSpan("proxynator.start");
+        managedTracer.endSpan();
     }
 
     public boolean isAlive() {

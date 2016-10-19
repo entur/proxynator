@@ -1,7 +1,6 @@
 package org.rutebanken.proxynator.service;
 
 import com.google.cloud.trace.ManagedTracer;
-import com.sun.org.apache.xerces.internal.util.URI;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
@@ -9,6 +8,9 @@ import org.littleshoot.proxy.HttpFiltersAdapter;
 import org.littleshoot.proxy.impl.ProxyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public class TracerFilter extends HttpFiltersAdapter {
 
@@ -32,11 +34,11 @@ public class TracerFilter extends HttpFiltersAdapter {
     public HttpResponse clientToProxyRequest(HttpObject httpObject) {
         if ( httpObject instanceof HttpRequest ) {
             String name = originalRequest.uri();
-            log.info("Call starting... ("+name+")");
+            log.debug("Call starting... ("+name+")");
             try {
                 URI uri = new URI( name );
                 name = uri.getHost()+uri.getPath();
-            } catch (URI.MalformedURIException ignored) {}
+            } catch (URISyntaxException e) {}
             managedTracer.startSpan(name);
         }
 
@@ -46,7 +48,7 @@ public class TracerFilter extends HttpFiltersAdapter {
     @Override
     public HttpObject serverToProxyResponse(HttpObject httpObject) {
         if ( ProxyUtils.isLastChunk(httpObject)) {
-            log.info("Call finished... ("+originalRequest.uri()+")");
+            log.debug("Call finished... ("+originalRequest.uri()+")");
             managedTracer.endSpan();
         }
 
