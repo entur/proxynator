@@ -3,3 +3,6 @@
 Connecting application metrics by setting up a http proxy.
 
 * https://github.com/adamfisk/LittleProxy
+* https://cloud.google.com/trace/api/
+* https://github.com/GoogleCloudPlatform/cloud-trace-java
+* https://github.com/GoogleCloudPlatform/cloud-trace-java/blob/master/samples/buffering-grpc/src/main/java/com/google/cloud/trace/samples/grpc/buffering/SimpleBufferingGrpc.java

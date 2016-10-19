@@ -40,6 +40,7 @@ public final class LittleProxyService {
                 .withAllowLocalOnly(false)
                 .withPort(port.intValue())
                 .withFiltersSource( createFilterSource())
+                .withTransparent(true)
                 .start();
     }
 
@@ -49,6 +50,18 @@ public final class LittleProxyService {
             public HttpFilters filterRequest(HttpRequest originalRequest) {
                 return new TracerFilter(traceService, originalRequest);
             }
+
+            /*
+            @Override
+            public int getMaximumRequestBufferSizeInBytes() {
+                return 10 * 1024 * 1024;
+            }
+
+            @Override
+            public int getMaximumResponseBufferSizeInBytes() {
+                return 10 * 1024 * 1024;
+            }
+            */
         };
     }
 

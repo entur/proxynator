@@ -1,6 +1,7 @@
 package org.rutebanken.proxynator.service;
 
 import com.google.cloud.trace.ManagedTracer;
+import com.sun.org.apache.xerces.internal.util.URI;
 import io.netty.handler.codec.http.HttpObject;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
@@ -30,17 +31,13 @@ public class TracerFilter extends HttpFiltersAdapter {
     @Override
     public HttpResponse clientToProxyRequest(HttpObject httpObject) {
         if ( httpObject instanceof HttpRequest ) {
-            log.info("Initiating http request ("+originalRequest.uri()+")");
-
-            /*
-            if (httpObject instanceof HttpMessage) {
-                HttpHeaders headers =(((HttpMessage) httpObject).headers());
-                for ( Map.Entry<String, String> x : headers ) {
-                    log.info("  "+x.getKey()+" = "+x.getValue());
-                }
-            }*/
-        } else if ( httpObject instanceof HttpResponse ) {
-            log.info("Initiating http response");
+            String name = originalRequest.uri();
+            log.debug("Call finished... ("+name+")");
+            try {
+                URI uri = new URI( name );
+                name = uri.getHost()+uri.getPath();
+            } catch (URI.MalformedURIException ignored) {}
+            managedTracer.startSpan(name);
         }
 
         return null;
@@ -49,7 +46,8 @@ public class TracerFilter extends HttpFiltersAdapter {
     @Override
     public HttpObject serverToProxyResponse(HttpObject httpObject) {
         if ( ProxyUtils.isLastChunk(httpObject)) {
-            log.info("Call finished... ("+originalRequest.uri()+")");
+            log.debug("Call finished... ("+originalRequest.uri()+")");
+            managedTracer.endSpan();
         }
 
         return httpObject;

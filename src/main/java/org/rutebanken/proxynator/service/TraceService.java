@@ -54,6 +54,9 @@ public class TraceService {
 
     @PostConstruct
     public void initializeTracer() throws IOException {
+        // Note - link to flushable tracesink:
+        // https://github.com/GoogleCloudPlatform/cloud-trace-java/blob/master/samples/buffering-grpc/src/main/java/com/google/cloud/trace/samples/grpc/buffering/SimpleBufferingGrpc.java
+
         // Create the raw tracer.
         TraceSource traceSource = new TraceSource();
         TraceSink traceSink = new GrpcTraceSink("cloudtrace.googleapis.com",
@@ -69,6 +72,11 @@ public class TraceService {
         // Create the managed tracer.
         traceContextHandler = new DefaultTraceContextHandler(
                 traceContextFactory.rootContext());
+
+        // Uncomment if you want to debug connection at startup
+        //ManagedTracer managedTracer = new TraceContextHandlerTracer(tracer, traceContextHandler);
+        //managedTracer.startSpan("proxynator.start");
+        //managedTracer.endSpan();
     }
 
     public boolean isAlive() {

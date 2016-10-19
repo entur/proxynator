@@ -177,11 +177,11 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <version>0.4.0</version>
         </dependency>
 
-        <!--dependency>
+        <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty</artifactId>
             <version>1.0.1</version>
-        </dependency-->
+        </dependency>
 
         <dependency>
             <groupId>io.netty</groupId>
