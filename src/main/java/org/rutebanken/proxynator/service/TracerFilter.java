@@ -40,7 +40,11 @@ public class TracerFilter extends HttpFiltersAdapter {
                 name = uri.getHost()+uri.getPath();
             } catch (URISyntaxException e) {}
             if ( managedTracer != null ) {
-                managedTracer.startSpan(name);
+                try {
+                    managedTracer.startSpan(name);
+                } catch ( Exception e ) {
+                    log.error("Got exception trying to start the span with name: "+name, e);
+                }
             }
         }
 
@@ -52,7 +56,11 @@ public class TracerFilter extends HttpFiltersAdapter {
         if ( ProxyUtils.isLastChunk(httpObject)) {
             log.debug("Call finished... ("+originalRequest.uri()+")");
             if ( managedTracer != null ) {
-                managedTracer.endSpan();
+                try {
+                    managedTracer.endSpan();
+                } catch ( Exception e ) {
+                    log.error("Unexpected exception trying to close span: "+originalRequest.uri(), e);
+                }
             }
         }
 
