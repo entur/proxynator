@@ -1,8 +1,158 @@
 # Proxynator
 
-Connecting application metrics by setting up a http proxy.
+Collecting application metrics in google trace by setting up a http proxy.
+This project has been set up for use in kubernetes, where application metrics
+are not readily available. The metrics are collected in a non-intrusive
+manner.
+
+What it gives you, is a list in google trace of your calls, with timing metrics. The
+metrics logged as the host+URI, which makes it possible to follow the performance of
+the calls.
+
+## References
 
 * https://github.com/adamfisk/LittleProxy
 * https://cloud.google.com/trace/api/
 * https://github.com/GoogleCloudPlatform/cloud-trace-java
-* https://github.com/GoogleCloudPlatform/cloud-trace-java/blob/master/samples/buffering-grpc/src/main/java/com/google/cloud/trace/samples/grpc/buffering/SimpleBufferingGrpc.java
+* link:https://github.com/GoogleCloudPlatform/cloud-trace-java/blob/master/samples/buffering-grpc/src/main/java/com/google/cloud/trace/samples/grpc/buffering/SimpleBufferingGrpc.java[com/google/cloud/.../SimpleBufferingGrpc.java]
+* https://fabric8.io/gitbook/mavenPlugin.html
+
+## Future directions
+
+At the time of writing, this project is a bare bones proof-of-concept, and no
+effort has been put into optimizing the data collection and processing.
+
+Future improvements would be:
+
+* Use buffering for metrics collection. Currently just scaling up number of instances.
+* Implement sub-trace support. Currently only supporting 1 level. Sub level
+  tracing would need client library / code for the different platforms.
+* Release to docker hub
+
+## Usage
+
+You need to adapt these instructions to what suits your environment.
+
+Build the code, and the docker image:
+
+```
+mvn -Prutebanken
+```
+
+This gives you the image `eu.gcr.io/carbon-1287/proxynator:0.0.1-SNAPSHOT`.
+Tag it as you wish, and push it to your favorite docker repository. The
+maven project is based on the fabric8.io maven plugin.
+
+There are 2 more steps:
+
+* Start the service and pod
+* Add instruction to use the proxy from your other pods
+
+### Starting the service and pod
+
+The following configuration can be adapted to your environment:
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: proxynator
+  labels:
+    name: proxynator
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+  - port: 9077
+    targetPort: 9077
+    name: proxyport
+  selector:
+    name: proxynator
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: proxynator
+  labels:
+    name: proxynator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: proxynator
+  template:
+    metadata:
+      labels:
+        name: proxynator
+    spec:
+      containers:
+      - name: proxynator
+        image: eu.gcr.io/carbon-1287/proxynator:0.0.1-SNAPSHOT
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+            name: http
+          - containerPort: 9077
+            name: proxyport
+        resources:
+          requests:
+            memory: "250Mi"
+            cpu: "100m"
+          limits:
+            memory: "500Mi"
+            cpu: "200m"
+        command:
+          - /deployments/run-java.sh
+        env:
+          - name: JAVA_OPTIONS
+            value: "-server -Dspring.config.location=http://SOMEWHERE/proxynator.properties -Xmx250m -Dfile.encoding=UTF-8"
+        volumeMounts:
+          - name: trace-key
+            mountPath: /etc/secret/trace-key
+        readinessProbe:
+          httpGet:
+            path: '/proxynator/health/ready'
+            port: 8080
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: '/proxynator/health/up'
+            port: 8080
+          initialDelaySeconds: 45
+          timeoutSeconds: 15
+      imagePullSecrets:
+        - name: rutebanken-registry-key
+      volumes:
+      - name: trace-key
+        secret:
+          secretName: carbon-default-application-key
+```
+
+#### Kubernetes configuration
+
+You need to have modified the `application.properties` file, or supply some
+external properties. Interesting properties are:
+
+```
+server.port=8080
+proxy.port:9077
+google.credentials.location=/etc/secret/trace-key/google-application-key.json
+```
+
+You need to have added a secret similarly to this:
+
+```
+kubectl create secret generic carbon-default-application-key --from-file=google-application-key.json=Project-d2d722ccd9e1-key.json
+```
+
+### Using the proxy
+
+Add the following to your java application:
+
+```
+-Dhttp.proxyHost=proxynator -Dhttp.proxyPort=9077 -Dhttp.nonProxyHosts=
+```
+
+The setup for other platforms are analogous.
