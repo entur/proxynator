@@ -52,6 +52,8 @@ public class TraceService {
 
     private TraceContextHandler traceContextHandler;
 
+    private int counter = 0;
+
     @PostConstruct
     public void initializeTracer() throws IOException {
         // Note - link to flushable tracesink:
@@ -101,6 +103,14 @@ public class TraceService {
      * @return A tracer created with basis in the service
      */
     public ManagedTracer createManagedTracer() {
+        if ( counter++ % 1000 == 0 ) {
+            try {
+                log.info("Re-initializing managed tracer for every 1000nd calls.");
+                initializeTracer();
+            } catch (IOException e) {
+                log.warn("Unable to re-initialize managedTraced, using previous instance.", e);
+            }
+        }
         return new TraceContextHandlerTracer(tracer, traceContextHandler);
     }
 
