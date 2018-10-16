@@ -1,4 +1,4 @@
-# Proxynator
+# Proxynator image:https://circleci.com/gh/rutebanken/proxynator/tree/master.svg?style=svg["CircleCI", link="https://circleci.com/gh/rutebanken/proxynator/tree/master"]
 
 Collecting application metrics in google trace by setting up a http proxy.
 This project has been set up for use in kubernetes, where application metrics
