@@ -175,7 +175,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
         <dependency>
             <groupId>com.google.auth</groupId>
             <artifactId>google-auth-library-oauth2-http</artifactId>
-            <version>0.4.0</version>
+            <version>0.11.0</version>
         </dependency>
 
         <dependency>
