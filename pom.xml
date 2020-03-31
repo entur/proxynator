@@ -77,7 +77,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
             <dependency>
                 <groupId>org.littleshoot</groupId>
                 <artifactId>littleproxy</artifactId>
-                <version>${littleproxy.version}</version>
+                <version>1.1.1</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -201,7 +201,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
         <dependency>
             <groupId>org.littleshoot</groupId>
             <artifactId>littleproxy</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 
