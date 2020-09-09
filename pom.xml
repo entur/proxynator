@@ -181,7 +181,7 @@ Inspired by: https://github.com/fabric8io/ipaas-quickstarts/
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-netty</artifactId>
-            <version>1.0.1</version>
+            <version>1.31.0</version>
         </dependency>
 
         <dependency>
